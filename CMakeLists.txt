@@ -65,8 +65,8 @@ ament_target_dependencies(ekfNode rclcpp std_msgs sensor_msgs bluerov2commonmsgs
 add_executable(controllerbluerov2 src/controller/controllerOfBluerov2.h src/controller/controllerOfBluerov2.cpp src/controller/controllerRosNode.cpp)
 ament_target_dependencies(controllerbluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
 
-add_executable(visualizationPing360 src/visualizationSonarImage.cpp)
-ament_target_dependencies(visualizationPing360 rclcpp std_msgs sensor_msgs bluerov2commonmsgs ping360_sonar_msgs cv_bridge)
+#add_executable(visualizationPing360 src/visualizationSonarImage.cpp)
+#ament_target_dependencies(visualizationPing360 rclcpp std_msgs sensor_msgs bluerov2commonmsgs ping360_sonar_msgs cv_bridge)
 
 
 #add_executable(guibluerov2 src/gui/guiBlueROV2.cpp src/gui/mainwindow.h src/gui/mainwindow.cpp src/gui/rosHandlerGui.cpp src/gui/rosHandlerGui.h src/gui/qcustomplot.h src/gui/qcustomplot.cpp)
@@ -77,23 +77,21 @@ ament_target_dependencies(visualizationPing360 rclcpp std_msgs sensor_msgs bluer
 install(TARGETS
         ekfNode
         controllerbluerov2
-        visualizationPing360
-#        guibluerov2
         DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 
-ament_python_install_package(${PROJECT_NAME})
+#ament_python_install_package(${PROJECT_NAME})
 
 install(PROGRAMS
         scripts/pwmServicesTopTube.py
         scripts/pwmServicesSensorTube.py
-        scripts/leakageSensorTopTube.py
-        scripts/leakageSensorSensorTube.py
+#        scripts/leakageSensorTopTube.py
+#        scripts/leakageSensorSensorTube.py
         scripts/powerControlBotomTube.py
-        scripts/mjpeg_cam_python.py
+#        scripts/mjpeg_cam_python.py
         bashScripts/xrcClientStart.sh
         bashScripts/startpigpiod.sh
         DESTINATION lib/${PROJECT_NAME}
