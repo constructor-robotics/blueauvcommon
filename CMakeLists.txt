@@ -7,7 +7,7 @@ set(CATKIN_ENABLE_TESTING OFF)
 project(bluerov2common)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+# add_compile_options(-std=c++11)d
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -62,8 +62,8 @@ ament_target_dependencies(ekfNode rclcpp std_msgs sensor_msgs bluerov2commonmsgs
 #target_link_libraries(testFile generalhelpfullib )
 
 
-add_executable(controllerbluerov2 src/controller/controllerOfBluerov2.h src/controller/controllerOfBluerov2.cpp src/controller/controllerRosNode.cpp)
-ament_target_dependencies(controllerbluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
+#add_executable(controllerbluerov2 src/controller/controllerOfBluerov2.h src/controller/controllerOfBluerov2.cpp src/controller/controllerRosNode.cpp)
+#ament_target_dependencies(controllerbluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
 
 add_executable(controllerpx4bluerov2 src/px4_controller/mode.hpp src/px4_controller/main.cpp)
 ament_target_dependencies(controllerpx4bluerov2 px4_ros2_cpp rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
@@ -80,7 +80,8 @@ ament_target_dependencies(controllerpx4bluerov2 px4_ros2_cpp rclcpp std_msgs sen
 
 install(TARGETS
         ekfNode
-        controllerbluerov2
+#        controllerbluerov2
+        controllerpx4bluerov2
         DESTINATION lib/${PROJECT_NAME}
 )
 

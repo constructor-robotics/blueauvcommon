@@ -29,7 +29,7 @@ public:
   void updateSetpoint(float dt_s) override
   {
     // Setting constant angles and thrust.
-    _att_setpoint->update(-0.0f * M_PI / 180.f, 0.0f * M_PI / 180.f, 0.f, {0.1f, 0.f, 0.f});
+    _att_setpoint->update(-0.0f * M_PI / 180.f, 0.0f * M_PI / 180.f, 0.f, {0.9f, 0.f, 0.f});
 
   }
 
