@@ -40,7 +40,7 @@ find_package(visualization_msgs REQUIRED)
 find_package(waterlinked_a50 REQUIRED)
 find_package(ping360_sonar_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
-
+find_package(px4_ros2_cpp REQUIRED)
 
 ############## LIBRARYS ##############
 #add_library(generalhelpfullib SHARED src/generalTools/generalHelpfulTools.cpp)
@@ -64,6 +64,10 @@ ament_target_dependencies(ekfNode rclcpp std_msgs sensor_msgs bluerov2commonmsgs
 
 add_executable(controllerbluerov2 src/controller/controllerOfBluerov2.h src/controller/controllerOfBluerov2.cpp src/controller/controllerRosNode.cpp)
 ament_target_dependencies(controllerbluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
+
+add_executable(controllerpx4bluerov2 src/px4_controller/mode.hpp src/px4_controller/main.cpp)
+ament_target_dependencies(controllerpx4bluerov2 px4_ros2_cpp rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
+
 
 #add_executable(visualizationPing360 src/visualizationSonarImage.cpp)
 #ament_target_dependencies(visualizationPing360 rclcpp std_msgs sensor_msgs bluerov2commonmsgs ping360_sonar_msgs cv_bridge)
