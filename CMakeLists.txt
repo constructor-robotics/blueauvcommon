@@ -65,7 +65,7 @@ ament_target_dependencies(ekfNode rclcpp std_msgs sensor_msgs bluerov2commonmsgs
 #add_executable(controllerbluerov2 src/controller/controllerOfBluerov2.h src/controller/controllerOfBluerov2.cpp src/controller/controllerRosNode.cpp)
 #ament_target_dependencies(controllerbluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
 
-add_executable(controllerpx4bluerov2 src/px4_controller/mode.hpp src/px4_controller/main.cpp)
+add_executable(controllerpx4bluerov2 src/px4_controller/mode.hpp src/px4_controller/main.cpp src/px4_controller/controllerOfBluerov2.cpp src/px4_controller/controllerOfBluerov2.h)
 ament_target_dependencies(controllerpx4bluerov2 px4_ros2_cpp rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 px4_msgs visualization_msgs)
 
 
