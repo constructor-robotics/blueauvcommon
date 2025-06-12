@@ -16,16 +16,18 @@ static const bool kEnableDebugOutput = true;
 
 int main(int argc, char *argv[]) {
     rclcpp::init(argc, argv);
-
-    auto nodePX4Shared = std::make_shared<MyNodeWithMode>(kNodeName, kEnableDebugOutput);
     auto nodeControllLogic = std::make_shared<controllerOfBluerov2>();
+    auto nodePX4Shared = std::make_shared<MyNodeWithMode>(kNodeName, kEnableDebugOutput);
+
+    nodePX4Shared->getMode().setController(nodeControllLogic);
     rclcpp::executors::MultiThreadedExecutor executor;
 
     executor.add_node(nodePX4Shared);
     executor.add_node(nodeControllLogic);
-
-    std::thread executor_thread(std::bind(&rclcpp::executors::MultiThreadedExecutor::spin, &executor));
+    executor.spin();
+    // std::thread executor_thread(std::bind(&rclcpp::executors::MultiThreadedExecutor::spin, &executor));
     // rclcpp::spin(std::make_shared<MyNodeWithMode>(kNodeName, kEnableDebugOutput));
+    // rclcpp::spin();
     rclcpp::shutdown();
     return 0;
 }

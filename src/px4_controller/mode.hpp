@@ -17,10 +17,13 @@ class UUVAttModeTest : public px4_ros2::ModeBase
 {
 public:
   explicit UUVAttModeTest(rclcpp::Node & node)
-  : ModeBase(node, kName)
+  : ModeBase(node, kName),controller_(nullptr)
   {
-    _att_setpoint = std::make_shared<px4_ros2::AttitudeSetpointType>(*this);
+    this->_att_setpoint = std::make_shared<px4_ros2::AttitudeSetpointType>(*this);
+  }
 
+  void setController(std::shared_ptr<controllerOfBluerov2> controller) {
+    this->controller_ = controller;
   }
 
   void onActivate() override {}
@@ -30,11 +33,19 @@ public:
   void updateSetpoint(float dt_s) override
   {
     // Setting constant angles and thrust.
-    _att_setpoint->update(-0.0f * M_PI / 180.f, 0.0f * M_PI / 180.f, 20.0f * M_PI / 180.f, {0.5f, 0.f, 0.f});
+    // _att_setpoint->update(-0.0f * M_PI / 180.f, 0.0f * M_PI / 180.f, 20.0f * M_PI / 180.f, {0.5f, 0.f, 0.f});
+
+    this->controller_->getRollPitchYawThrustControllLogic(this->des_thrust,this->des_rpy);
+
+    this->_att_setpoint->update(static_cast<float>(des_rpy[0]), static_cast<float>(des_rpy[1]), static_cast<float>(des_rpy[2]),
+      {static_cast<float>(des_thrust.x()), static_cast<float>(des_thrust.y()),static_cast<float>(des_thrust.z())});
 
   }
 
 private:
   std::shared_ptr<px4_ros2::AttitudeSetpointType> _att_setpoint;
+  std::shared_ptr<controllerOfBluerov2> controller_;
 
+  Eigen::Vector3d des_thrust;
+  Eigen::Vector3d des_rpy;
 };
