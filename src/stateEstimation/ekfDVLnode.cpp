@@ -45,9 +45,11 @@ public:
         rclcpp::QoS qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
 
         //default values should work with the classical BlueROV 2 in the lab
-        this->declare_parameter("simulation", bool{false});//decides which topic to hear
+        // this->declare_parameter("simulation", bool{false});//decides which topic to hear
+        this->declare_parameter("simulation", bool{true});//decides which topic to hear
         this->declare_parameter("dvl_position", std::vector<double>{0.0, 0.0, 0.0});
-        this->declare_parameter("dvl_rotation", std::vector<double>{0.0, 0.0, 2.35619449019});//rotation in roll pitch yaw
+        // this->declare_parameter("dvl_rotation", std::vector<double>{0.0, 0.0, 2.35619449019});//rotation in roll pitch yaw
+        this->declare_parameter("dvl_rotation", std::vector<double>{0.0, 0.0, 0.0});//rotation in roll pitch yaw
         this->declare_parameter("imu_position", std::vector<double>{0.0, 0.0, 0.0});
         this->declare_parameter("imu_rotation", std::vector<double>{0.0, 0.0, 0.0});//rotation in roll pitch yaw
         this->declare_parameter("baro_position", std::vector<double>{0.0, 0.0, 0.0});// currently not used
@@ -56,25 +58,30 @@ public:
 
 
         this->get_parameter("simulation", this->simulation);
-
+        std::cout << "using Simulation: " << this->simulation << std::endl;
         std::vector<double> tmpVector;
         this->get_parameter("dvl_position", tmpVector);
+        std::cout << "found DVL Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
         this->positionDVL.x() = tmpVector[0];
         this->positionDVL.y() = tmpVector[1];
         this->positionDVL.z() = tmpVector[2];
         this->get_parameter("dvl_rotation", tmpVector);
+        std::cout << "found DVL Rotation: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
         this->rotationOfDVL.x() = tmpVector[0];
         this->rotationOfDVL.y() = tmpVector[1];
         this->rotationOfDVL.z() = tmpVector[2];
         this->get_parameter("imu_position", tmpVector);
+        std::cout << "found IMU Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
         this->positionIMU.x() = tmpVector[0];
         this->positionIMU.y() = tmpVector[1];
         this->positionIMU.z() = tmpVector[2];
         this->get_parameter("imu_rotation", tmpVector);
+        std::cout << "found IMU Rotation: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
         this->rotationOfIMU.x() = tmpVector[0];
         this->rotationOfIMU.y() = tmpVector[1];
         this->rotationOfIMU.z() = tmpVector[2];
         this->get_parameter("baro_position", tmpVector);
+        std::cout << "found Baro Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
         this->positionBaro.x() = tmpVector[0];
         this->positionBaro.y() = tmpVector[1];
         this->positionBaro.z() = tmpVector[2];
