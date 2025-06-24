@@ -44,28 +44,74 @@ public:
     RosClassEKF() : Node("ekfStateEstimation"), currentEkf(rclcpp::Clock(RCL_ROS_TIME).now()) {
         rclcpp::QoS qos = rclcpp::QoS(rclcpp::KeepLast(1), rmw_qos_profile_sensor_data);
 
+        //default values should work with the classical BlueROV 2 in the lab
+        // this->declare_parameter("simulation", bool{false});//decides which topic to hear
+        this->declare_parameter("simulation", bool{true});//decides which topic to hear
+        this->declare_parameter("dvl_position", std::vector<double>{0.0, 0.0, 0.0});
+        // this->declare_parameter("dvl_rotation", std::vector<double>{0.0, 0.0, 2.35619449019});//rotation in roll pitch yaw
+        this->declare_parameter("dvl_rotation", std::vector<double>{0.0, 0.0, 0.0});//rotation in roll pitch yaw
+        this->declare_parameter("imu_position", std::vector<double>{0.0, 0.0, 0.0});
+        this->declare_parameter("imu_rotation", std::vector<double>{0.0, 0.0, 0.0});//rotation in roll pitch yaw
+        this->declare_parameter("baro_position", std::vector<double>{0.0, 0.0, 0.0});// currently not used
 
-        // External = 0; Mavros = 1; Gazebo = 2
+
+
+
+        this->get_parameter("simulation", this->simulation);
+        std::cout << "using Simulation: " << this->simulation << std::endl;
+        std::vector<double> tmpVector;
+        this->get_parameter("dvl_position", tmpVector);
+        std::cout << "found DVL Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
+        this->positionDVL.x() = tmpVector[0];
+        this->positionDVL.y() = tmpVector[1];
+        this->positionDVL.z() = tmpVector[2];
+        this->get_parameter("dvl_rotation", tmpVector);
+        std::cout << "found DVL Rotation: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
+        this->rotationOfDVL.x() = tmpVector[0];
+        this->rotationOfDVL.y() = tmpVector[1];
+        this->rotationOfDVL.z() = tmpVector[2];
+        this->get_parameter("imu_position", tmpVector);
+        std::cout << "found IMU Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
+        this->positionIMU.x() = tmpVector[0];
+        this->positionIMU.y() = tmpVector[1];
+        this->positionIMU.z() = tmpVector[2];
+        this->get_parameter("imu_rotation", tmpVector);
+        std::cout << "found IMU Rotation: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
+        this->rotationOfIMU.x() = tmpVector[0];
+        this->rotationOfIMU.y() = tmpVector[1];
+        this->rotationOfIMU.z() = tmpVector[2];
+        this->get_parameter("baro_position", tmpVector);
+        std::cout << "found Baro Position: ["<< tmpVector[0] << "," << tmpVector[1] << ","<< tmpVector[2]<< "]" <<std::endl;
+        this->positionBaro.x() = tmpVector[0];
+        this->positionBaro.y() = tmpVector[1];
+        this->positionBaro.z() = tmpVector[2];
+
         this->firstMessage = true;
         this->currentInputDVL = 0;
         this->currentInputIMU = 0;
-//        this->subscriberDVL.shutdown();
-        this->rotationOfDVL = Eigen::AngleAxisd(2.35619449019,
-                                                Eigen::Vector3d::UnitZ());//yaw rotation for correct alignment of DVL data; quick fix set to default
-        this->positionIMU = Eigen::Vector3d(0, 0, 0);
-        this->positionDVL = Eigen::Vector3d(0, 0, 0);
+
+        if (this->simulation)
+        {
+            this->subscriberPX4IMU = this->create_subscription<px4_msgs::msg::SensorCombined>("/fmu/out/sensor_combined", qos,
+                                                                       std::bind(&RosClassEKF::imuCallbackPX4,
+                                                                                 this, std::placeholders::_1));
+
+            this->subscriberDVLGazebo = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+                    "/dvl/velocity", qos, std::bind(&RosClassEKF::DVLCallbackSimulation, this, std::placeholders::_1));
+        }else
+        {
+            this->subscriberIMU = this->create_subscription<sensor_msgs::msg::Imu>("/imu/data", qos,
+                                                                       std::bind(&RosClassEKF::imuCallback,
+                                                                           this, std::placeholders::_1));
+
+            this->subscriberDVL = this->create_subscription<waterlinked_a50::msg::TransducerReportStamped>(
+                    "/velocity_estimate", qos, std::bind(&RosClassEKF::DVLCallbackDVL, this, std::placeholders::_1));
+
+        }
 
 
-        this->subscriberIMU = this->create_subscription<sensor_msgs::msg::Imu>("/imu/data", qos,
-                                                                               std::bind(&RosClassEKF::imuCallback,
-                                                                                         this, std::placeholders::_1));
 
-//        this->subscriberPX4IMU = this->create_subscription<px4_msgs::msg::SensorCombined>("/fmu/out/sensor_combined", qos,
-//                                                                               std::bind(&RosClassEKF::imuCallbackPX4,
-//                                                                                         this, std::placeholders::_1));
-        std::cout << "test DVL:" << std::endl;
-        this->subscriberDVL = this->create_subscription<waterlinked_a50::msg::TransducerReportStamped>(
-                "/velocity_estimate", qos, std::bind(&RosClassEKF::DVLCallbackDVL, this, std::placeholders::_1));
+
 
 
         this->subscriberDepthOwnTopic = this->create_subscription<bluerov2commonmsgs::msg::HeightStamped>("height_baro",
@@ -80,6 +126,7 @@ public:
 //                                                                                                        &RosClassEKF::depthSensorBaroPX4,
 //                                                                                                        this,
 //                                                                                                        std::placeholders::_1));
+
         this->subscriberDepthSensorBaroSensorTube = this->create_subscription<sensor_msgs::msg::FluidPressure>(
                 "/pressure", qos,
                 std::bind(
@@ -92,7 +139,7 @@ public:
 //                                                                                                          this,
 //                                                                                                          std::placeholders::_1));
 
-
+        //currently not used
         this->subscriberHeading = this->create_subscription<geometry_msgs::msg::Vector3Stamped>("magnetic_heading", qos,
                                                                                                 std::bind(
                                                                                                         &RosClassEKF::headingCallback,
@@ -137,6 +184,7 @@ private:
     rclcpp::Subscription<px4_msgs::msg::VehicleAirData>::SharedPtr subscriberDepthSensorVehicleAirData;
     rclcpp::Subscription<geometry_msgs::msg::Vector3Stamped>::SharedPtr subscriberHeading;
     rclcpp::Subscription<waterlinked_a50::msg::TransducerReportStamped>::SharedPtr subscriberDVL;
+    rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr subscriberDVLGazebo;
 
     //publisher
     rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr publisherPoseEkf;
@@ -147,14 +195,15 @@ private:
 
     rclcpp::TimerBase::SharedPtr timer_;
 
-    std::mutex updateSlamMutex;
-    Eigen::Quaterniond rotationOfDVL;
-    Eigen::Vector3d positionIMU, positionDVL;
+    std::mutex updateEKFMutex;
+    Eigen::Quaterniond rotationOfDVL,rotationOfIMU;
+    Eigen::Vector3d positionIMU, positionDVL,positionBaro;
 
     int currentInputDVL;
     int currentInputIMU;
     double pressureWhenStarted;
     bool firstMessage;
+    bool simulation;
     rclcpp::Time timeAtStart;
 
     void imuCallbackHelper(const sensor_msgs::msg::Imu::SharedPtr msg) {
@@ -265,18 +314,18 @@ private:
         newMsg.header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
 
 
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->imuCallbackHelper(std::make_shared<sensor_msgs::msg::Imu>(newMsg));
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg) {
         //change the orientation of the IMU message
 
 
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->imuCallbackHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void DVLCallbackDVLHelper(const waterlinked_a50::msg::TransducerReportStamped::SharedPtr msg) {
@@ -293,21 +342,21 @@ private:
     }
 
     void DVLCallbackDVL(const waterlinked_a50::msg::TransducerReportStamped::SharedPtr msg) {
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->DVLCallbackDVLHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
-    void DVLCallbackSimulationHelper(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg) {
-        this->currentEkf.updateDVL(msg->vector.x, msg->vector.y, msg->vector.z, Eigen::Quaterniond(1, 0, 0, 0),
+    void DVLCallbackSimulationHelper(const geometry_msgs::msg::TwistStamped::SharedPtr msg) {
+        this->currentEkf.updateDVL(msg->twist.linear.x, msg->twist.linear.y, msg->twist.linear.z, this->rotationOfDVL,
                                    this->positionDVL,
                                    msg->header.stamp);
     }
 
-    void DVLCallbackSimulation(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg) {
-        this->updateSlamMutex.lock();
+    void DVLCallbackSimulation(const geometry_msgs::msg::TwistStamped::SharedPtr msg) {
+        this->updateEKFMutex.lock();
         this->DVLCallbackSimulationHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void DVLCallbackMavrosHelper(const geometry_msgs::msg::TwistStamped::SharedPtr msg) {
@@ -317,26 +366,26 @@ private:
     }
 
     void DVLCallbackMavros(const geometry_msgs::msg::TwistStamped::SharedPtr msg) {
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->DVLCallbackMavrosHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
 
     bool resetEKF(const std::shared_ptr<bluerov2commonmsgs::srv::ResetEkf::Request> req,
                   std::shared_ptr<bluerov2commonmsgs::srv::ResetEkf::Response> res) {
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->currentEkf.resetToPos(req->x_pos, req->y_pos, req->yaw, req->reset_covariances);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
         res->reset_done = true;
         return true;
     }
 
     void depthSensorCallback(const bluerov2commonmsgs::msg::HeightStamped::SharedPtr msg) {
         std::cout << "this doesnt happen right?" << std::endl;
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->depthSensorHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void depthSensorBaroPX4(const px4_msgs::msg::SensorBaro::SharedPtr msg) {
@@ -355,9 +404,9 @@ private:
 //        std::cout << this->pressureWhenStarted << std::endl;
 //        std::cout << msg->pressure << std::endl;
 //        std::cout <<  newMsg.height << std::endl;
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->depthSensorHelper(std::make_shared<bluerov2commonmsgs::msg::HeightStamped>(newMsg));
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void depthSensorBaroSensorTubeCallback(const sensor_msgs::msg::FluidPressure::SharedPtr msg) {
@@ -378,9 +427,9 @@ private:
 //        std::cout << this->pressureWhenStarted << std::endl;
 //        std::cout << msg->fluid_pressure << std::endl;
 //        std::cout <<  newMsg.height << std::endl;
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->depthSensorHelper(std::make_shared<bluerov2commonmsgs::msg::HeightStamped>(newMsg));
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void depthSensorVehicleAir(const px4_msgs::msg::VehicleAirData::SharedPtr msg) {
@@ -393,9 +442,9 @@ private:
         newMsg->timestamp = msg->timestamp;
         newMsg->height = ((msg->baro_pressure_pa - this->pressureWhenStarted) * 1.0f) / (CONSTANTS_ONE_G * 1000.0f);
 
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->depthSensorHelper(newMsg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void depthSensorHelper(const bluerov2commonmsgs::msg::HeightStamped::SharedPtr msg) {
@@ -404,9 +453,9 @@ private:
 
     void headingCallback(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg) {
 
-        this->updateSlamMutex.lock();
+        this->updateEKFMutex.lock();
         this->headingHelper(msg);
-        this->updateSlamMutex.unlock();
+        this->updateEKFMutex.unlock();
     }
 
     void headingHelper(const geometry_msgs::msg::Vector3Stamped::SharedPtr msg) {
