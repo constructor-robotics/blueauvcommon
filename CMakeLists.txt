@@ -47,6 +47,27 @@ find_package(px4_ros2_cpp REQUIRED)
 #target_include_directories(generalhelpfullib PUBLIC  src/generalTools)
 #ament_target_dependencies(generalhelpfullib tf2 Eigen3)
 
+set(lib_name i2c)
+add_library(${lib_name} src/i2c/i2c.cpp)
+
+install(TARGETS ${lib_name}
+        EXPORT ${lib_name}Target
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+set(lib_name ms5837)
+add_library(${lib_name} src/barometer/ms5837.cpp)
+target_link_libraries(${lib_name} i2c)
+install(TARGETS ${lib_name}
+        EXPORT ${lib_name}Target
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+
 include_directories(src/generalTools
         ${QWT_INCLUDE_DIR})
 
@@ -76,11 +97,21 @@ ament_target_dependencies(controllerpx4bluerov2 px4_ros2_cpp rclcpp std_msgs sen
 #add_executable(guibluerov2 src/gui/guiBlueROV2.cpp src/gui/mainwindow.h src/gui/mainwindow.cpp src/gui/rosHandlerGui.cpp src/gui/rosHandlerGui.h src/gui/qcustomplot.h src/gui/qcustomplot.cpp)
 #ament_target_dependencies(guibluerov2 rclcpp std_msgs sensor_msgs bluerov2commonmsgs tf2 Eigen3 cv_bridge waterlinked_a50)
 #target_link_libraries(guibluerov2 Qt5::Core Qt5::Gui Qt5::Widgets Qt5::PrintSupport Qt5::Gamepad)
+add_executable(barometer_node
+        src/barometer/barometer_node.cpp
+        src/barometer/barometer.cpp
+        src/barometer/barometer_params.cpp
+)
+target_link_libraries(barometer_node ms5837)
+ament_target_dependencies(barometer_node rclcpp std_msgs sensor_msgs )
+
+
 
 
 install(TARGETS
         ekfNode
 #        controllerbluerov2
+        barometer_node
         controllerpx4bluerov2
         DESTINATION lib/${PROJECT_NAME}
 )
