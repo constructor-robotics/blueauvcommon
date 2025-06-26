@@ -91,7 +91,14 @@ def generate_launch_description():
         executable='ekfNode',
         name='ekfNode',
         output='screen',
-        parameters=[],
+        parameters=[
+            {'simulation': False},
+            {'dvl_position': [0,0,0]},
+            {'dvl_rotation': [0,0,2.35619449019]},
+            {'imu_position': [0,0,0]},
+            {'imu_rotation': [0,0,3.14159265359]},
+            {'baro_position': [0,0,0]}
+        ],
         arguments=[]
     )
     ld.add_action(ekf_node)

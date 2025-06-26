@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
 // USA
 
-#include "hardware/barometer/ms5837.hpp"
+#include "ms5837.hpp"
 
 #include <linux/i2c-dev.h>
 #include <linux/i2c.h>
@@ -24,7 +24,7 @@
 #include <chrono>
 #include <thread>
 
-#include "hardware/i2c/i2c.hpp"
+#include "i2c.hpp"
 
 namespace hardware {
 namespace barometer {

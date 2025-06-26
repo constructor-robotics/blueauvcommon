@@ -20,7 +20,7 @@
 #include <sensor_msgs/msg/fluid_pressure.hpp>
 #include <sensor_msgs/msg/temperature.hpp>
 
-#include "hardware/barometer/ms5837.hpp"
+#include "ms5837.hpp"
 
 namespace hardware {
 namespace barometer {
@@ -48,6 +48,7 @@ class Barometer : public rclcpp::Node {
   MS5837 barometer_;
   bool barometer_initialized_{false};
   Params params_;
+    // std::string device_;
 };
 
 }  // namespace barometer

@@ -21,7 +21,9 @@ namespace hardware {
 namespace barometer {
 Barometer::Barometer(rclcpp::NodeOptions const &_options)
     : Node("barometer", _options) {
-  InitParams();
+  params_.device="0x76";
+  params_.update_period_ms=100;
+  // InitParams();
   InitPublishers();
   barometer_.Open(params_.device);
   InitTimers();
@@ -102,5 +104,5 @@ void Barometer::PublishTemperature(const rclcpp::Time &_now,
 }  // namespace barometer
 }  // namespace hardware
 
-#include <rclcpp_components/register_node_macro.hpp>
-RCLCPP_COMPONENTS_REGISTER_NODE(hardware::barometer::Barometer)
+// #include <rclcpp_components/register_node_macro.hpp>
+// RCLCPP_COMPONENTS_REGISTER_NODE(hardware::barometer::Barometer)
