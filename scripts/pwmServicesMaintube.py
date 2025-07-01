@@ -34,7 +34,7 @@ class PWMSignalServer(Node):
         self.srvCamera = self.create_service(CameraAngle, 'camera_angle_service', self.handleAngleServo)
         # print("test5")
 
-        self.publisher_ = self.create_publisher(LeakageDetection, 'leakage_status_top_tube', 1)
+        self.publisher_ = self.create_publisher(LeakageDetection, 'leakage_status_main_tube', 1)
 
 
 

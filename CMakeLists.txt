@@ -126,11 +126,11 @@ install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 #ament_python_install_package(${PROJECT_NAME})
 
 install(PROGRAMS
-        scripts/pwmServicesTopTube.py
-        scripts/pwmServicesSensorTube.py
+        scripts/pwmServicesMaintube.py
+        scripts/pwmServicesSensortube.py
 #        scripts/leakageSensorTopTube.py
 #        scripts/leakageSensorSensorTube.py
-        scripts/powerControlBotomTube.py
+        scripts/powerControlBottomTube.py
 #        scripts/mjpeg_cam_python.py
         bashScripts/xrcClientStart.sh
         bashScripts/startpigpiod.sh

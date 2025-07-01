@@ -21,7 +21,7 @@ namespace hardware {
 namespace barometer {
 Barometer::Barometer(rclcpp::NodeOptions const &_options)
     : Node("barometer", _options) {
-  params_.device="0x76";
+  params_.device="/dev/i2c-1";// not nice but these are the default parameters could be done better in the future.
   params_.update_period_ms=100;
   // InitParams();
   InitPublishers();

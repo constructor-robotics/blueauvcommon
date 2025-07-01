@@ -19,7 +19,7 @@ def generate_launch_description():
         executable='dvl_node',
         name='dvl_node',
         output='screen',
-        parameters=[{"IP": "10.42.0.211"},
+        parameters=[{"IP": "192.168.10.12"},
                     {"port": "16171"},
                     {"dvl_pos_topic_name": "position_estimate"},
                     {"dvl_vel_topic_name": "velocity_estimate"}
@@ -28,31 +28,31 @@ def generate_launch_description():
     )
     ld.add_action(waterlinked_node)
 
-    ping_360_node = Node(
-        package='ping360_sonar',
-        executable='ping360_node',
-        name='ping360_node',
-        output='screen',
-        parameters=[{"device": "/dev/ping360"},
-                    {"baudrate": 115200},
-                    {"gain": 0},
-                    {"numberOfSamples": 500},
-                    {"transmitFrequency": 750},
-                    {"sonarRange": 20},
-                    {"speedOfSound": 1500},
-                    {"debug": False},
-                    {"threshold": 200},
-                    {"enableDataTopic": True},
-                    {"maxAngle": 400},
-                    {"minAngle": 0},
-                    {"oscillate": True},
-                    {"step": 1},
-                    {"imgSize": 500},
-                    {"queueSize": 1}
-                    ],
-        arguments=[]
-    )
-    ld.add_action(ping_360_node)
+    # ping_360_node = Node(
+    #     package='ping360_sonar',
+    #     executable='ping360_node',
+    #     name='ping360_node',
+    #     output='screen',
+    #     parameters=[{"device": "/dev/ping360"},
+    #                 {"baudrate": 115200},
+    #                 {"gain": 0},
+    #                 {"numberOfSamples": 500},
+    #                 {"transmitFrequency": 750},
+    #                 {"sonarRange": 20},
+    #                 {"speedOfSound": 1500},
+    #                 {"debug": False},
+    #                 {"threshold": 200},
+    #                 {"enableDataTopic": True},
+    #                 {"maxAngle": 400},
+    #                 {"minAngle": 0},
+    #                 {"oscillate": True},
+    #                 {"step": 1},
+    #                 {"imgSize": 500},
+    #                 {"queueSize": 1}
+    #                 ],
+    #     arguments=[]
+    # )
+    # ld.add_action(ping_360_node)
 
     # parameters_file_path = Path(get_package_share_directory('bluespace_ai_xsens_mti_driver'), 'param', 'xsens_mti_node.yaml')
 
@@ -63,7 +63,7 @@ def generate_launch_description():
         output='screen',
         parameters=[
             {"scan_for_devices": True},
-            {"port": "/dev/ttyUSB1"},
+            {"port": "/dev/xsens"},
             {"baudrate": 115200},
             {"pub_imu": True},
             {"pub_quaternion": False},
@@ -86,42 +86,33 @@ def generate_launch_description():
     )
     ld.add_action(imu_node)
 
-    ekf_node = Node(
-        package='bluerov2common',
-        executable='ekfNode',
-        name='ekfNode',
-        output='screen',
-        parameters=[
-            {'simulation': False},
-            {'dvl_position': [0,0,0]},
-            {'dvl_rotation': [0,0,2.35619449019]},
-            {'imu_position': [0,0,0]},
-            {'imu_rotation': [0,0,3.14159265359]},
-            {'baro_position': [0,0,0]}
-        ],
-        arguments=[]
-    )
-    ld.add_action(ekf_node)
+    # ekf_node = Node(
+    #     package='bluerov2common',
+    #     executable='ekfNode',
+    #     name='ekfNode',
+    #     output='screen',
+    #     parameters=[
+    #         {'simulation': False},
+    #         {'dvl_position': [0,0,0]},
+    #         {'dvl_rotation': [0,0,2.35619449019]},
+    #         {'imu_position': [0,0,0]},
+    #         {'imu_rotation': [0,0,3.14159265359]},
+    #         {'baro_position': [0,0,0]}
+    #     ],
+    #     arguments=[]
+    # )
+    # ld.add_action(ekf_node)
 
-    baro_node = Node(
-        package='hardware',
-        executable='barometer',
-        name='barometer',
-        output='screen',
-        parameters=[],
-        arguments=[]
-    )
-    ld.add_action(baro_node)
 
-    control_node = Node(
-        package='bluerov2common',
-        executable='controllerbluerov2',
-        name='controllerbluerov2',
-        output='screen',
-        parameters=[],
-        arguments=[]
-    )
-    ld.add_action(control_node)
+    # control_node = Node(
+    #     package='bluerov2common',
+    #     executable='controllerbluerov2',
+    #     name='controllerbluerov2',
+    #     output='screen',
+    #     parameters=[],
+    #     arguments=[]
+    # )
+    # ld.add_action(control_node)
 
 
     # tritech_node = Node(
