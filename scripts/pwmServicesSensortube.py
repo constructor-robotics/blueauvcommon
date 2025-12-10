@@ -21,7 +21,7 @@ class PWMSignalServer(Node):
     angleCurrent = 90
 
     def __init__(self):
-        super().__init__('pwm_signal_server')
+        super().__init__('pwm_signal_server_sensor_tube')
         # print("test1")
         self.initGPIOPins()
         timer_period = 1

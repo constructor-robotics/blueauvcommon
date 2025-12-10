@@ -12,30 +12,30 @@ def generate_launch_description():
     arg = SetEnvironmentVariable('RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1')
     ld.add_action(arg)
 
-    xrc_node = Node(
-        package='bluerov2common',
-        executable='xrcClientStart.sh',
-        name='xrcClientStart',
-        output='screen',
-        parameters=[],
-        arguments=[]
-    )
-    ld.add_action(xrc_node)
-
-    # camera_node = Node(
-    #     package='v4l2_camera',
-    #     executable='v4l2_camera_node',
-    #     name='v4l2_camera_node',
+    # xrc_node = Node(
+    #     package='bluerov2common',
+    #     executable='xrcClientStart.sh',
+    #     name='xrcClientStart',
     #     output='screen',
-    #     parameters=[
-    #         {"video_device": "/dev/video0"},
-    #         {"pixel_format": "YUYV"},
-    #         {"image_size": [640, 480]},
-    #         {"time_per_frame": [1, 15]}
-    #     ],
+    #     parameters=[],
     #     arguments=[]
     # )
-    # ld.add_action(camera_node)
+    # ld.add_action(xrc_node)
+    # ros2 run camera_ros camera_node --ros-args -p camera:=0 -p width:=800 -p height:=600
+    camera_node = Node(
+        package='camera_ros',
+        executable='camera_node',
+        name='camera_node',
+        output='screen',
+        parameters=[
+            {"camera": 0},
+            {"width": 1280},
+            {"height": 1024},
+
+        ],
+        arguments=[]
+    )
+    ld.add_action(camera_node)
 
     # pwm_node = Node(
     #     package='bluerov2common',

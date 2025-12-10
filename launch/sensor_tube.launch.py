@@ -28,31 +28,31 @@ def generate_launch_description():
     )
     ld.add_action(waterlinked_node)
 
-    # ping_360_node = Node(
-    #     package='ping360_sonar',
-    #     executable='ping360_node',
-    #     name='ping360_node',
-    #     output='screen',
-    #     parameters=[{"device": "/dev/ping360"},
-    #                 {"baudrate": 115200},
-    #                 {"gain": 0},
-    #                 {"numberOfSamples": 500},
-    #                 {"transmitFrequency": 750},
-    #                 {"sonarRange": 20},
-    #                 {"speedOfSound": 1500},
-    #                 {"debug": False},
-    #                 {"threshold": 200},
-    #                 {"enableDataTopic": True},
-    #                 {"maxAngle": 400},
-    #                 {"minAngle": 0},
-    #                 {"oscillate": True},
-    #                 {"step": 1},
-    #                 {"imgSize": 500},
-    #                 {"queueSize": 1}
-    #                 ],
-    #     arguments=[]
-    # )
-    # ld.add_action(ping_360_node)
+    ping_360_node = Node(
+        package='ping360_sonar',
+        executable='ping360_node',
+        name='ping360_node',
+        output='screen',
+        parameters=[{"device": "/dev/ping360"},
+                    {"baudrate": 115200},
+                    {"gain": 0},
+                    {"numberOfSamples": 500},
+                    {"transmitFrequency": 750},
+                    {"sonarRange": 5},
+                    {"speedOfSound": 1500},
+                    {"debug": False},
+                    {"threshold": 200},
+                    {"enableDataTopic": True},
+                    {"maxAngle": 400},
+                    {"minAngle": 0},
+                    {"oscillate": True},
+                    {"step": 1},
+                    {"imgSize": 500},
+                    {"queueSize": 1}
+                    ],
+        arguments=[]
+    )
+    ld.add_action(ping_360_node)
 
     # parameters_file_path = Path(get_package_share_directory('bluespace_ai_xsens_mti_driver'), 'param', 'xsens_mti_node.yaml')
 
